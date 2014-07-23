@@ -1,5 +1,5 @@
-import QtQuick 2.3
-import QtQuick.Controls 1.2
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 
 //treeView is based on code user "Jens" posted in the qt-project forum (http://qt-project.org/forums/viewthread/30521/#146845)
 
@@ -18,6 +18,7 @@ ScrollView {
         id: label
         text: model.name
         color: activePalette.windowText
+	Component.onCompleted: console.log("Showing node \"" + text + "\" at " +  Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))
     }
     contentItem: Loader {
         id: content

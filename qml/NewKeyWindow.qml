@@ -1,7 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Window 2.1
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 
@@ -36,9 +36,8 @@ BasicWindow {
             text: path
             color: disabledPalette.text
         }
-        RowLayout {
-            spacing: defaultSpacing
-
+        GridLayout {
+            columns: 2
             Label {
                 id:nameLabel
                 text: qsTr("Key Name: ")
@@ -49,14 +48,9 @@ BasicWindow {
                 focus: true
                 text: keyName
             }
-        }
-        RowLayout {
-            id:valueLayout
-            spacing: defaultSpacing
-
             Label {
                 id: valueLabel
-                text: qsTr("Key Value:  ")
+                text: qsTr("Key Value: ")
             }
             TextField {
                 id: valueTextField
@@ -64,6 +58,34 @@ BasicWindow {
                 text: keyValue
             }
         }
+//         RowLayout {
+//             spacing: defaultSpacing
+// 
+//             Label {
+//                 id:nameLabel
+//                 text: qsTr("Key Name: ")
+//             }
+//             TextField {
+//                 id: nameTextField
+//                 Layout.fillWidth: true
+//                 focus: true
+//                 text: keyName
+//             }
+//         }
+//         RowLayout {
+//             id:valueLayout
+//             spacing: defaultSpacing
+// 
+//             Label {
+//                 id: valueLabel
+//                 text: qsTr("Key Value:  ")
+//             }
+//             TextField {
+//                 id: valueTextField
+//                 Layout.fillWidth: true
+//                 text: keyValue
+//             }
+//         }
         BasicRectangle {
             id: metaArea
             Layout.fillWidth: true
@@ -113,6 +135,8 @@ BasicWindow {
         keyAreaView.model.setDataValue(keyAreaView.currentRow, nameTextField.text, "Name")
         keyAreaView.model.setDataValue(keyAreaView.currentRow, valueTextField.text, "Value")
 
+	console.log("Editing finished at " + Qt.formatDateTime(new Date(), "hh:mm:zzz") + ". Keyname: " +  nameTextField.text + " KeyValue: " + valueTextField.text)
+
         //delete metaKeys
         for(var i = 0; i < metaAreaModel.rowCount(); i++)
             metaAreaListView.model.get(i).node.deleteMeta(metaAreaListView.model.get(i).name)
@@ -125,8 +149,10 @@ BasicWindow {
             metaAreaListView.model.qmlInsertRow(i, keyAreaSelectedItem.node);
 
         //fill the meta nodes with provided names/values
-        for(var i = 0; i < metaKeyModel.count; i++)
+        for(var i = 0; i < metaKeyModel.count; i++){
+		console.log("MetaKeyname: " +  metaKeyModel.get(i).metaName + " KeyValue: " + metaKeyModel.get(i).metaValue)
             metaAreaListView.model.setDataValue(i, [metaKeyModel.get(i).metaName, metaKeyModel.get(i).metaValue], "MetaValue")
+	}
 
         metaKeyModel.clear()
     }

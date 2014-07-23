@@ -1,12 +1,14 @@
-import QtQuick 2.3
-import QtQuick.Controls 1.2
+import QtQuick 2.2
+import QtQuick.Controls 1.1
 import QtQuick.Window 2.0
-import QtQuick.Controls.Styles 1.2
+import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.1
-import QtQuick.Dialogs 1.2
+import QtQuick.Dialogs 1.1
 
 ApplicationWindow {
     id: mainWindow
+
+	Component.onCompleted: console.log("Editor started at " + Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))
 
     visible: true
     width: Screen.desktopAvailableWidth
@@ -51,12 +53,25 @@ ApplicationWindow {
         keyValue: keyAreaSelectedItem === null ? "" : keyAreaSelectedItem.value
     }
 
-    NewKeyWindow {
-        id: newArrayWindow
-        title: qsTr("Create new Array Entry")
-        valueLayout.visible: false
-        nameLabel.text: qsTr("Array Name: ")
-        addButton.text: qsTr("New Array Entry")
+//     NewKeyWindow {
+//         id: newArrayWindow
+//         title: qsTr("Create new Array Entry")
+//         valueLayout.visible: false
+//         nameLabel.text: qsTr("Array Name: ")
+//         addButton.text: qsTr("New Array Entry")
+//     }
+
+    MessageDialog {
+        id: creditsDialog
+        icon: StandardIcon.Information
+        Component.onCompleted: console.log("Credits dialog opened at " + Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))
+        title: qsTr("Credits")
+        text: "Elektra Editor\n\nRaffael Pancheri\ne0003088@student.tuwien.ac.at"
+        standardButtons: StandardButton.Close
+        onRejected: {
+            console.log("Credits dialog closed at " + Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))
+            creditsDialog.visible = false
+        }
     }
 
     UnmountBackendWindow {
@@ -79,12 +94,14 @@ ApplicationWindow {
         iconSource: "icons/new.png"
         tooltip: qsTr("New Key")
         onTriggered: newKeyWindow.show()
+       	enabled: false
     }
 
     Action {
         id:newArrayAction
         text: qsTr("Array Entry...")
         onTriggered: newArrayWindow.show()
+        enabled: false
     }
 
     Action {
@@ -93,6 +110,7 @@ ApplicationWindow {
         iconSource: "icons/delete.png"
         tooltip: "Delete"
         shortcut: StandardKey.Delete
+        enabled: false
     }
 
     Action {
@@ -101,6 +119,7 @@ ApplicationWindow {
         iconSource: "icons/import.png"
         tooltip: qsTr("Import Configuration")
         onTriggered: importDialog.open()
+        enabled: false
     }
 
     Action {
@@ -109,6 +128,7 @@ ApplicationWindow {
         iconSource: "icons/export.png"
         tooltip: qsTr("Export Configuration")
         onTriggered: exportDialog.open()
+        enabled: false
     }
 
     Action {
@@ -144,6 +164,7 @@ ApplicationWindow {
         text: qsTr("Create Backend...")
         tooltip: qsTr("Create Backend")
         onTriggered: wizardLoader.show()
+        enabled: false
     }
 
     Action {
@@ -151,6 +172,7 @@ ApplicationWindow {
         text: qsTr("Unmount Backend...")
         tooltip: qsTr("Unmount Backend")
         onTriggered: unmountBackendWindow.show()
+        enabled: false
     }
 
     Action {
@@ -181,6 +203,13 @@ ApplicationWindow {
         tooltip: qsTr("Paste")
         shortcut: StandardKey.Paste
         enabled: false
+    }
+    
+    Action {
+        id: creditsAction
+        text: qsTr("Credits")
+        tooltip: qsTr("Credits")
+        onTriggered: creditsDialog.open()
     }
 
     menuBar: MenuBar {
@@ -216,6 +245,7 @@ ApplicationWindow {
                 id:dbExit
                 text: qsTr("Exit")
                 shortcut: StandardKey.Quit
+		onTriggered: {console.log("Editor exited at " + Qt.formatDateTime(new Date(), "hh:mm:ss:zzz")); Qt.quit()}
             }
         }
 
@@ -277,7 +307,8 @@ ApplicationWindow {
             id:about
             title: qsTr("&About")
             MenuItem {
-                text: qsTr("Credits ")
+                id:edCredits
+                action: creditsAction
             }
         }
     }
@@ -306,6 +337,7 @@ ApplicationWindow {
             onTriggered: {
                 editKeyWindow.show()
                 editKeyWindow.populateMetaArea()
+		console.log("Opened editwindow at " +  Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))
             }
         }
     }
@@ -356,7 +388,7 @@ ApplicationWindow {
                 id: searchField
                 Layout.fillWidth: true
                 focus: true
-                onAccepted: {searchResultsListView.model = treeView.model.find(text); searchResultsListView.currentIndex = -1}
+                onAccepted: {searchResultsListView.model = treeView.model.find(text); searchResultsListView.currentIndex = -1; console.log("Searching for " + text)}
             }
         }
     }
@@ -409,7 +441,7 @@ ApplicationWindow {
                     backgroundVisible: false
                     Component.onCompleted: currentRow = -1
                     //QVariantMap
-                    onClicked: keyAreaSelectedItem = model.get(currentRow)
+                    onClicked: {keyAreaSelectedItem = model.get(currentRow); console.log("selected Key \"" + keyAreaSelectedItem.name + "\"")}
 
                     model:{
                         if(treeView.currentNode !== null)
@@ -485,6 +517,7 @@ ApplicationWindow {
                     id: searchResultsScrollView
                     anchors.fill: parent
                     anchors.margins: defaultMargins
+                    anchors.rightMargin: searchResultsCloseButton.width
 
                     ListView {
                         id: searchResultsListView
@@ -501,7 +534,7 @@ ApplicationWindow {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: {searchResultsListView.currentIndex = index}
+                                onClicked: {searchResultsListView.currentIndex = index; console.log("user clicked " + text + " in searchwindow at " + Qt.formatDateTime(new Date(), "hh:mm:ss:zzz"))}
                             }
                         }
                     }

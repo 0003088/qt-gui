@@ -13,10 +13,19 @@ int main(int argc, char* argv[])
 	qRegisterMetaType<TreeViewModel> ("TreeViewModel");
 	qRegisterMetaType<ConfigNode> ("ConfigNode");
 
-	QString locale = QLocale::system().name();
+	QLocale locale;
+
+	qDebug() << QLocale::system().name() << " with argc: " << argc;
+
+	if (argc == 2)
+	{
+	    locale =  QLocale(QLocale::German);
+	} else {
+	    locale =  QLocale(QLocale::English);
+	}
 
 	QTranslator tr;
-	tr.load(QString(":/qml/i18n/lang_") + locale + QString(".qm"));
+	tr.load(QString(":/qml/i18n/lang_") + locale.name() + QString(".qm"));
 	app.installTranslator(&tr);
 
 	QQmlApplicationEngine engine;
@@ -31,11 +40,13 @@ int main(int argc, char* argv[])
 	ctxt->setContextProperty("externTreeModel", QVariant::fromValue(model));
 	engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 
-    PrintVisitor printer;
-    model->accept(printer);
+//    PrintVisitor printer;
+//    model->accept(printer);
 
-    KeySetVisitor ksVisit;
-    model->accept(ksVisit);
+//    KeySetVisitor ksVisit;
+//    model->accept(ksVisit);
 
-	return app.exec();
+	int ret = app.exec();
+	qDebug() << "Editor exited at " << QTime::currentTime().toString("hh:mm:ss:zzz") << " ret: " << ret;
+	return ret;
 }
